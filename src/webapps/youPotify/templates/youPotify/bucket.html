@@ -1,0 +1,156 @@
+{% extends 'youPotify/base.html' %}
+{% load static %}
+{% block content %}
+
+        <div class="col-lg-9">
+          <h4>Bucket</h4>
+          <div class="iframe">
+          </div>
+          <table class="table table-hover">
+            <tbody id="search_result">
+            <tr>
+              <td>Add</td>
+              <td>Song</td>
+              <td>Artist</td>
+              <td><span class="glyphicon glyphicon-time" aria-hidden="true"></span></td>
+              <td><span class="glyphicon glyphicon-paperclip" aria-hidden="true"></span></td>
+              <td><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></td>
+            </tr>
+
+            {% for track in tracks %}
+              <tr class="track_row" data-id="{{track.d_id}}" onClick="selectTrack('{{track.id}}')">
+                <td>
+                  <span onclick="showAddSongModal('{{track.songId}}', '{{track.d_id}}')" class="glyphicon glyphicon-plus"></span>
+                </td>
+                <td>{{track.name}}</td>
+                <td>{{track.artist}}</td>
+                <td>{{track.duration}}</td>
+                <td><a href="#" onclick="showMsg('{{track.msg}}')">{{track.sender.first_name}}</a></td>
+                <td><a href="#" onclick="deleteSongOnClick('{{track.d_id}}')"><span class="glyphicon glyphicon-trash" aria-hidden="true"></span></a></td>
+              </tr>
+            {% endfor %}
+
+            </tbody>
+          </table>
+        </div>
+      
+      </div>
+    </div> <!-- /container -->
+
+      <!-- Modals -->
+      <!-- add Song Modal -->
+      <div class="modal fade" id="addSongModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="myModalLabel">Add this song to a playlist</h4>
+            </div>
+              <div class="modal-body">
+               <div class="row">
+                <div class="col-md-4">
+                  <h6 id="song-title">unknown</h6>
+                  <p id="song-artist">unknown</p>
+                  <img style="width: 100%" id="song-thumbnail" src="" alt="">
+                </div>
+                <div class="col-md-8">
+                  <label> Adding this song to...</label>
+                  <select id="playlistOptions" class="form-control">
+                    {% for playlist in playlists %}
+                    <option value="{{playlist.id}}">{{playlist.name}}</option>
+                    {% endfor %}
+                  </select>   
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-de fault" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary" onclick="pickSongToPlaylist()">Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- confirm msg Modal, General usage-->
+      <div id="confirmModal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+              <h6 id="confirm-modal-msg">123</h6>
+            </div>
+          </div>
+        </div>
+      </div>      
+
+      <!-- msg Modal, show msg from a friend-->
+      <div id="msgModal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="myModalLabel">A message sent from friend</h4>
+            </div>
+            <div class="modal-body">
+              <h6 id="show-modal-msg">...</h6>
+            </div>
+          </div>
+        </div>
+      </div>  
+
+      <!-- create playlist Modal-->
+      <div id="createPlaylistModal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog modal-sm" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="myModalLabel">New Playlist</h4>
+            </div>
+            <div class="modal-body">
+              <div class="input-group">
+                <input id='create-playlist-name' type="text" class="form-control" placeholder="Playlist Name">
+                <span class="input-group-btn">
+                  <button type="button" class="btn btn-default" onclick="createPlaylist()">
+                    <span class="glyphicon glyphicon-play" aria-hidden="true"></span>
+                  </button>
+                </span>
+              </div><!-- /input-group -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- delete song Modal-->
+      <div id="deleteModal" class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+              <h6 id="show-modal-msg">Are you sure you want to delete the song?</h6>
+              <h6 id="deleteSongId" data-id=""></h6>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-de fault" data-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-primary" onclick="deleteSong('bucket', '{{bucket.id}}')">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>    
+      <!-- End Modals -->
+
+      <script src="{% static 'youPotify/js/jquery.js' %}" type="text/javascript"></script>
+      <script src="{% static 'youPotify/js/fb/fb-login.js' %}" type="text/javascript"></script>
+      <script src="{% static 'youPotify/js/bootstrap.min.js' %}" type="text/javascript"></script>
+      <script src="{% static 'youPotify/js/script.js' %}" type="text/javascript"></script>
+      <script src="{% static 'youPotify/js/search_songs.js' %}" type="text/javascript"></script>
+      <script src="{% static 'youPotify/js/socket.js' %}" type="text/javascript"></script>
+      <script src="{% static 'youPotify/js/reconnecting-websocket.min.js' %}" type="text/javascript"></script>
+
+  </body>
+</html>
+
+{% endblock %}

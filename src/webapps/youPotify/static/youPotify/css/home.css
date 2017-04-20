@@ -1,0 +1,25 @@
+/* Space out content a bit */
+body {
+  padding-top: 51px;
+}
+
+select.form-control {
+	background-color: #FFFFFF
+}
+
+input.form-control[type="textarea"] {
+	background-color: #FFFFFF
+}
+
+.profile-sidebar {
+	text-align: center
+}
+
+.profile-sidebar .profile-pic{
+	margin: 20px;
+}
+
+.iframe {
+	text-align: center;
+	padding: 20px;
+}
